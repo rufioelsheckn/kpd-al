@@ -1,0 +1,68 @@
+PREF := avr-
+CC := $(PREF)gcc
+OBJCOPY := $(PREF)objcopy
+SIZE := $(PREF)size
+
+MMCU:=attiny4313
+PROG_MK:=t4313
+
+INC_DIRS := include
+INC_DIRS_OPT := $(addprefix -I, $(INC_DIRS))
+
+DEFINED := F_CPU=4000000ULL
+DEFINE_OPT := $(addprefix -D, $(DEFINED))
+
+BIN_DIR := bin
+PROGNAME := $(notdir $(CURDIR))
+
+TESTS_DIR := tests
+SRC_DIRS := src $(TESTS_DIR)
+
+OBJ_DIR := obj
+
+CC_OPTS :=  -MD $(INC_DIRS_OPT) $(DEFINE_OPT) -O2 -mmcu=$(MMCU) -Wall
+LINK_OPTS := -mmcu=$(MMCU) -Os -Wl,-Map=$(OBJ_DIR)/mapfile.map
+
+OBJFILES := main.o service.o regeneration.o kpd-al-lib.o
+OBJFILES := $(addprefix $(OBJ_DIR)/, $(OBJFILES))
+
+TEST_FILES := $(addprefix $(BIN_DIR)/test_, $(addsuffix .hex, $(basename $(notdir $(wildcard $(TESTS_DIR)/*.c)))))
+
+target:$(BIN_DIR)/$(PROGNAME).hex
+	@echo
+	@echo "Success!"
+	@$(SIZE) $<
+
+all:tst target
+
+
+$(BIN_DIR)/%.hex: $(OBJ_DIR)/%.elf
+	$(OBJCOPY) -O ihex -j .text -j .data $< $@
+
+prog:$(BIN_DIR)/$(PROGNAME).hex
+	./avrprog.sh $(PROG_MK) $<
+
+tst:$(TEST_FILES)
+
+
+$(OBJ_DIR)/test_%.elf:$(OBJ_DIR)/%.o $(OBJ_DIR)/kpd-al-lib.o
+	$(CC) $(LINK_OPTS) $^ -o $@
+
+$(OBJ_DIR)/$(PROGNAME).elf: $(OBJFILES)
+	$(CC) $(LINK_OPTS) $(OBJFILES) -o $@
+
+VPATH := $(SRC_DIRS) 
+$(OBJ_DIR)/%.o: $(OBJ_DIR)/%.s
+	$(CC) -c $(CC_OPTS) $< -o $@
+$(OBJ_DIR)/%.s: %.c Makefile
+	$(CC) -S $(CC_OPTS) $< -o $@
+
+include $(wildcard $(OBJ_DIR)/*.d)
+
+
+clean:
+	rm -fr $(OBJ_DIR)/* $(BIN_DIR)/* $(addsuffix /*~,$(INC_DIRS)) $(addsuffix /*~,$(SRC_DIRS)) *~
+
+
+.PHONY: all target tst
+.PRECIOUS: $(OBJ_DIR)/test_%.elf $(OBJ_DIR)/$(PROGNAME).elf
