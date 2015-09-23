@@ -12,10 +12,11 @@ const	uint8_t		PROGMEM	D_MARK[]	= {D1,D0,D1,D2,D1,D3,D1,D4,D1,D6};
 
 uint8_t 	EEMEM	mark[3]			= {D1,D2,D3};
 uint16_t	EEMEM	N[MAX_N]		= {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-uint8_t		EEMEM	ee_sensor1=0, ee_sensor2=1;
 uint8_t		EEMEM	ee_N			= 0;
 uint8_t		EEMEM	ee_Tbw			= 0;
 uint8_t		EEMEM	ee_flt			= 0;
+
+uint8_t		EEMEM	ee_sensor1=0, ee_sensor2=1;
 
 void prog_qmax(int8_t add);
 void makeQmax();
@@ -86,33 +87,38 @@ inline void programming(){
 	print();
 	
 	dh=dm=dl=S(A);
+	INIT_IF_BUTTON(3);
 	for ( u = PROG_WAIT ; u != 0 ; --u ){
-		IF_BUTTON(3)
+		IF_BUTTON();
 			prog_qmax(1);
 			goto l1;
-		END_IF_BUTTON(3)
+		END_IF_BUTTON();
 		_delay_ms(10);
 	}
+	CLOSE_IF_BUTTON();
 	dh=dm=dl=S(D);
+	INIT_IF_BUTTON(3);
 	for ( u = PROG_WAIT ; u != 0 ; --u ){
-		IF_BUTTON(3)
+		IF_BUTTON()
 			prog_qmax(-1);
 			goto l1;
-		END_IF_BUTTON(3)
+		END_IF_BUTTON()
 		_delay_ms(10);
 	}
+	CLOSE_IF_BUTTON();
 	
 l1:	ee_read_tbw(tmp);
 	read_tbw(tmp);
 	makeTbw();
+	INIT_IF_BUTTON(3);
 	for ( u = PROG_WAIT ; u != 0 ; --u ){
-		IF_BUTTON(3)
+		IF_BUTTON();
 			tmp++;
 			if ( tmp==sizeof(TBW)/sizeof(uint32_t) ) tmp = 0;
 			read_tbw(tmp)
 			makeTbw();
 			u=PROG_WAIT;
-		END_IF_BUTTON(3)
+		END_IF_BUTTON();
 		print_d();
 		_delay_ms(10);
 		if ( dl ){
@@ -122,18 +128,20 @@ l1:	ee_read_tbw(tmp);
 			dl = DT;
 		}
 	}
+	CLOSE_IF_BUTTON();
 	ee_write_tbw(tmp);
 	
 	ee_read_flt(tmp);
 	read_ftl(tmp);
 	dl = 0;
+	INIT_IF_BUTTON(3);
 	for ( u = PROG_WAIT ; u != 0 ; --u ){
-		IF_BUTTON(3)
+		IF_BUTTON()
 			tmp++;
 			if ( tmp==sizeof(D_MARK)/sizeof(uint8_t) ) tmp = 0;
 			read_ftl(tmp);
 			u=PROG_WAIT;
-		END_IF_BUTTON(3)
+		END_IF_BUTTON()
 		print_d();
 		_delay_ms(10);
 		if ( dl ){
@@ -143,6 +151,7 @@ l1:	ee_read_tbw(tmp);
 			dl = DINCH;
 		}
 	}
+	CLOSE_IF_BUTTON();
 	ee_write_flt(tmp);
 }
 
@@ -151,18 +160,20 @@ void prog_qmax(int8_t add){
 	ee_read_n(tmp);
 	read_n(tmp);
 	makeQmax();
+	INIT_IF_BUTTON(3);
 	for ( u = PROG_WAIT ; u != 0 ; --u ){
-		IF_BUTTON(3)
+		IF_BUTTON()
 			tmp+=add;
 			if ( tmp==255 ) tmp = MAX_N-1;
 			else if ( tmp==MAX_N ) tmp = 0;
 			read_n(tmp)
 			makeQmax();
 			u=PROG_WAIT;
-		END_IF_BUTTON(3)
+		END_IF_BUTTON()
 		print_d();
 		_delay_ms(10);
 	}
+	CLOSE_IF_BUTTON();
 	ee_write_n(tmp);
 }
 
