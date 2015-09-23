@@ -39,7 +39,7 @@ uint32_t A=0,B=0,C=0,D=0;
 #define pump_relax(){			\
 	if(PUMP_ON_LEVEL){__asm__ __volatile__("cbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}	\
 	else {__asm__ __volatile__("sbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}			\
-	status &= ~PUMP_STATUS_MSK;	\
+	status &= ~STATUS_T1;		\
 	status |= STATUS_T2;		\
 }
 
@@ -131,4 +131,8 @@ ISR(TIMER0_COMPA_vect){
 		}
 	}
 }
+
+ISR(BADISR_vect){
+}
+
 

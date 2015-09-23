@@ -10,28 +10,33 @@ int main (){
 	init();
 	_delay_ms(500);
 	PORTB = S(A);
+	_delay_ms(500);
 	tau = MAIN_TIME_ms(1000);
 	T = MAIN_TIME_ms(2000);
 	t3 = MAIN_TIME_ms(10000);
 	sei();
 	while(1){
+		INIT_IF_BUTTON(50);
 		while((status&STATUS_T1)==0){
-			IF_BUTTON(50)
+			IF_BUTTON();
 				pump_push_normal();
-			END_IF_BUTTON(50)
+			END_IF_BUTTON();
 			_delay_ms(10);
 		}
+		CLOSE_IF_BUTTON();
 		PORTB = S(G);
 		while((status&STATUS_T1)!=0);
 		PORTB = S(D);
 		while((status&STATUS_T2)!=0);
 		PORTB = S(A);
+		INIT_IF_BUTTON(50);
 		while((status&STATUS_T1)==0){
-			IF_BUTTON(50)
+			IF_BUTTON();
 				pump_push_regen();
-			END_IF_BUTTON(50)
+			END_IF_BUTTON();
 			_delay_ms(10);
 		}
+		CLOSE_IF_BUTTON();
 		PORTB = S(G);
 		while((status&STATUS_T1)!=0);
 		PORTB = S(D);

@@ -37,6 +37,7 @@ all:tst target
 
 
 $(BIN_DIR)/%.hex: $(OBJ_DIR)/%.elf
+	@mkdir -p $(BIN_DIR)
 	$(OBJCOPY) -O ihex -j .text -j .data $< $@
 
 prog:$(BIN_DIR)/$(PROGNAME).hex
@@ -55,6 +56,7 @@ VPATH := $(SRC_DIRS)
 $(OBJ_DIR)/%.o: $(OBJ_DIR)/%.s
 	$(CC) -c $(CC_OPTS) $< -o $@
 $(OBJ_DIR)/%.s: %.c Makefile
+	@mkdir -p $(OBJ_DIR)
 	$(CC) -S $(CC_OPTS) $< -o $@
 
 include $(wildcard $(OBJ_DIR)/*.d)
