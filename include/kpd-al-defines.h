@@ -203,7 +203,7 @@
 			
 
 #define IF_BUTTON()	{							\
-				if (BUTTON_LEVEL?BUTTON_PORT&BUTTON_MSK:!(BUTTON_PORT&BUTTON_MSK)){	\
+				if ((!(BUTTON_PORT&BUTTON_MSK))^BUTTON_LEVEL){	\
 					if (__nc__!=0){				\
 						__nc__--;			\
 						if (__nc__==0){
