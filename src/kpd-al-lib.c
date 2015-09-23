@@ -33,13 +33,14 @@ uint32_t A=0,B=0,C=0,D=0;
 #define pump_push(){			\
 	if(PUMP_ON_LEVEL){__asm__ __volatile__("sbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}	\
 	else {__asm__ __volatile__("cbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}			\
-	status		|= STATUS_T1;	\
+	status	|= STATUS_T1;		\
 }
 
 #define pump_relax(){			\
 	if(PUMP_ON_LEVEL){__asm__ __volatile__("cbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}	\
 	else {__asm__ __volatile__("sbi %0,%1\n\t": :"I"(&PORTD-__SFR_OFFSET),"I"(PUMP_PIN));}			\
-	status ^= PUMP_STATUS_MSK;	\
+	status &= ~PUMP_STATUS_MSK;	\
+	status |= STATUS_T2;		\
 }
 
 void print(){
@@ -108,7 +109,6 @@ inline void pump_push_normal(){
 	}
 }
 inline void pump_push_regen(){
-	status &= ~PUMP_STATUS_MSK;
 	pump_push();
 	t1 = main_counter + tau;
 	t2 = main_counter + t3;
@@ -121,15 +121,13 @@ ISR(TIMER0_COMPA_vect){
 		pump_relax();
 	}
 	if ( main_counter == t2 ){
+		status &= ~STATUS_T2;
 		if (status&STATUS_OVER){
 			pump_push_normal();
 		}
 		else if (status & STATUS_REGENERARION){
 			status&=~STATUS_BW;
 			pump_push_regen();
-		}
-		else{
-			status&=~PUMP_STATUS_MSK;
 		}
 	}
 }
