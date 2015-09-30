@@ -50,18 +50,18 @@ int main(){
 		u = eeprom_read_byte(SENSOR_CHANGE_PORT&SENSOR_CHANGE_MSK?&ee_sensor2:&ee_sensor1);
 		Kli = pgm_read_word(sensors+u);
 		mul3(u);
-		
+
 		asm volatile (
-			"add %A2,%4\n\t"
-			"adc %B2,__zero_reg__\n\t"
+			"add %A3,%4\n\t"
+			"adc %B3,__zero_reg__\n\t"
 			"lpm %0,Z+\n\t"
 			"lpm %1,Z+\n\t"
 			"lpm %2,Z\n\t"
-			:"=r"(dh),"=r"(dm),"=r"(dl)
-			:"e"(sensors_disp),"r"(u)
+			:"=a"(dh),"=a"(dm),"=a"(dl)
+			:"z"(sensors_disp),"r"(u)
 		);
 	}
-	
+
 	print();
 	
 	ee_read_n(n);
@@ -186,8 +186,8 @@ void makeQmax(){
 
 void makeTbw(){
 	uint16_t tmp = Tbw/3004;
-	dh  = digs[((uint8_t)tmp)/10];
-	dm  = digs[((uint8_t)tmp)%10];
+	dh  = DIGS(((uint8_t)tmp)/10);
+	dm  = DIGS(((uint8_t)tmp)%10);
 	dh  = 0;
 }
 
@@ -200,7 +200,7 @@ void read_ftl(uint8_t x){
 		"adc %B2,__zero_reg__\n\t"
 		"lpm %0,Z+\n\t"
 		"lpm %1,Z\n\t"
-		:"=r"(dh),"=r"(dm)
-		:"e"(D_MARK),"r"(x)
+		:"=a"(dh),"=a"(dm)
+		:"z"(D_MARK),"r"(x)
 	);
 }

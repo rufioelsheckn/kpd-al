@@ -119,7 +119,7 @@
 #define	TCCR1B_REG	0x04
 #define	TCCR1C_REG	0x00
 
-#define	TIMSK_REG	(TOIE1|ICIE1|OCIE0A)
+#define	TIMSK_REG	((1<<TOIE1)|(1<<ICIE1)|(1<<OCIE0A))
 
 //определение предделителя по режиму работы
 
@@ -168,6 +168,7 @@
 #define	MAX_N			20
 #define	PROG_WAIT		255
 #define PRINT_DELAY		100
+#define	PRINT_DEL		9
 
 
 
@@ -191,6 +192,8 @@
 #define MAIN_TIME_ms(x)	(x*F_CPU/(1000ULL*T0PRESC*(1+OCR0A_REG)))
 #define MAIN_TIME_s(x)	(x*F_CPU/(T0PRESC*(1+OCR0A_REG)))
 #define MAIN_TIME_m(x)	(x*60*F_CPU/(T0PRESC*(1+OCR0A_REG)))
+
+#define DIGS(x)	pgm_read_byte(digs+x);
 
 //относительно автономный блок восприятия нажатия кнопки с антидребезгом. выделен отдельно для облегчения наладки
 //код, который надо выполнить при условии, что кнопка была нажата, надо вставить между макросами IF_BUTTON и END_IF_BUTTON
@@ -253,15 +256,15 @@
 }
 
 
-#define BW(){					\
-	uint8_t tmp;				\
-	while(status&STATUS_BW){		\
-		tmp = (t2-main_counter)/30000;	\
-		dm  = digs[((uint8_t)tmp)/10];	\
-		dl  = digs[((uint8_t)tmp)%10];	\
-		dh  = 0;			\
-		print_d();			\
-		_delay_ms(10);			\
-	}					\
+#define BW(){							\
+	uint8_t tmp;						\
+	while(status&STATUS_BW){				\
+		tmp = ((t2-main_counter)/MAIN_TIME_m(1));	\
+		dm  = DIGS(tmp/10);				\
+		dl  = DIGS(tmp%10);				\
+		dh  = 0;					\
+		print_d();					\
+		_delay_ms(PRINT_DEL);				\
+	}							\
 }
 

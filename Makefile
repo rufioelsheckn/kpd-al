@@ -41,7 +41,7 @@ $(BIN_DIR)/%.hex: $(OBJ_DIR)/%.elf
 	$(OBJCOPY) -O ihex -j .text -j .data $< $@
 
 prog:$(BIN_DIR)/$(PROGNAME).hex
-	./avrprog.sh $(PROG_MK) $<
+	sh avrprog.sh $(PROG_MK) $<
 
 tst:$(TEST_FILES)
 

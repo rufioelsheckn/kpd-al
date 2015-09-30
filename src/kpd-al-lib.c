@@ -1,3 +1,5 @@
+#define KPD_LIB
+
 #include <kpd-al.h>
 
 
@@ -47,7 +49,7 @@ void print(){
 	uint8_t	u;
 	for (u = PRINT_DELAY ; u != 0 ; u--){
 		print_d();
-		_delay_ms(9);
+		_delay_ms(PRINT_DEL);
 	}
 }
 
@@ -118,6 +120,7 @@ inline void pump_push_regen(){
 ISR(TIMER0_COMPA_vect){
 	main_counter++;
 	if ( main_counter == t1 ){
+		PORTB ^= S(B);
 		pump_relax();
 	}
 	if ( main_counter == t2 ){
@@ -132,7 +135,6 @@ ISR(TIMER0_COMPA_vect){
 	}
 }
 
-ISR(BADISR_vect){
-}
 
+EMPTY_INTERRUPT(BADISR_vect);
 
