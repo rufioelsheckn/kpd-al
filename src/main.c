@@ -1,12 +1,11 @@
 #include <kpd-al.h>
 
 
-const	uint32_t	PROGMEM	TBW[]		= {1,MAIN_TIME_m(4),MAIN_TIME_m(6),MAIN_TIME_m(8),MAIN_TIME_m(10),MAIN_TIME_m(12),MAIN_TIME_m(16),MAIN_TIME_m(20),MAIN_TIME_m(24)};
+const	uint32_t	PROGMEM	TBW[]		= {1,MAIN_TIME_m(4)+1,MAIN_TIME_m(6)+1,MAIN_TIME_m(8)+1,MAIN_TIME_m(10)+1,MAIN_TIME_m(12)+1,MAIN_TIME_m(16)+1,MAIN_TIME_m(20)+1,MAIN_TIME_m(24)+1};
 const	uint16_t	PROGMEM	PUMP_tau	= MAIN_TIME_ms(100);
 const	uint16_t	PROGMEM	PUMP_T		= MAIN_TIME_ms(200);
 const	uint16_t	PROGMEM	D_K[]		= {60,90,100,120,150};
 const	uint8_t		PROGMEM	D_MARK[]	= {D1,D0,D1,D2,D1,D3,D1,D4,D1,D6};
-
 
 
 
@@ -94,7 +93,7 @@ inline void programming(){
 			prog_qmax(1);
 			goto l1;
 		END_IF_BUTTON();
-		_delay_ms(10);
+		_delay_ms(PRINT_DEL);
 	}
 	CLOSE_IF_BUTTON();
 	dh=dm=dl=S(D);
@@ -104,7 +103,7 @@ inline void programming(){
 			prog_qmax(-1);
 			goto l1;
 		END_IF_BUTTON()
-		_delay_ms(10);
+		_delay_ms(PRINT_DEL);
 	}
 	CLOSE_IF_BUTTON();
 	
@@ -121,7 +120,7 @@ l1:	ee_read_tbw(tmp);
 			u=PROG_WAIT;
 		END_IF_BUTTON();
 		print_d();
-		_delay_ms(10);
+		_delay_ms(PRINT_DEL);
 		if ( dl ){
 			dl = 0;
 		}
@@ -144,7 +143,7 @@ l1:	ee_read_tbw(tmp);
 			u=PROG_WAIT;
 		END_IF_BUTTON()
 		print_d();
-		_delay_ms(10);
+		_delay_ms(PRINT_DEL);
 		if ( dl ){
 			dl = 0;
 		}
@@ -172,7 +171,7 @@ void prog_qmax(int8_t add){
 			u=PROG_WAIT;
 		END_IF_BUTTON()
 		print_d();
-		_delay_ms(10);
+		_delay_ms(PRINT_DEL);
 	}
 	CLOSE_IF_BUTTON();
 	ee_write_n(tmp);
@@ -185,9 +184,9 @@ void makeQmax(){
 }
 
 void makeTbw(){
-	uint16_t tmp = Tbw/3004;
-	dh  = DIGS(((uint8_t)tmp)/10);
-	dm  = DIGS(((uint8_t)tmp)%10);
+	uint8_t tmp = Tbw/MAIN_TIME_m(1);
+	dh  = DIGS(tmp/10);
+	dm  = DIGS(tmp%10);
 	dh  = 0;
 }
 

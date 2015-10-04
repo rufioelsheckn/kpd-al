@@ -8,6 +8,7 @@ const	uint16_t	PROGMEM	sensors[]	= {26,28};
 const	uint8_t		PROGMEM	sensors_disp[]	= {D1,D0|PDP,D0,D6|PDP,D0,D0};
 
 
+uint8_t		EEMEM	OSCCAL_REG		= 0x7F;
 
 
 uint32_t t1 = 0;
@@ -29,7 +30,7 @@ uint32_t main_counter = 0;
 
 uint16_t n_before,n;
 
-uint32_t A=0,B=0,C=0,D=0;
+uint32_t A=0,B=UINT32_MAX-40000,C=UINT32_MAX-40000,D=UINT32_MAX-40000;
 
 
 #define pump_push(){			\

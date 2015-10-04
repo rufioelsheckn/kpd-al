@@ -32,5 +32,6 @@ extern		const		uint8_t		PROGMEM	sensors_disp[];
 
 
 extern				uint8_t		ee_sensor1, ee_sensor2;
+extern				uint8_t		EEMEM	OSCCAL_REG;
 
 #endif

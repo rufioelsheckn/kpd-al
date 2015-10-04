@@ -193,7 +193,7 @@
 #define MAIN_TIME_s(x)	(x*F_CPU/(T0PRESC*(1+OCR0A_REG)))
 #define MAIN_TIME_m(x)	(x*60*F_CPU/(T0PRESC*(1+OCR0A_REG)))
 
-#define DIGS(x)	pgm_read_byte(digs+x);
+#define DIGS(x)	pgm_read_byte(digs+(x));
 
 //относительно автономный блок восприятия нажатия кнопки с антидребезгом. выделен отдельно для облегчения наладки
 //код, который надо выполнить при условии, что кнопка была нажата, надо вставить между макросами IF_BUTTON и END_IF_BUTTON
@@ -206,7 +206,7 @@
 			
 
 #define IF_BUTTON()	{							\
-				if ((!(BUTTON_PORT&BUTTON_MSK))^BUTTON_LEVEL){	\
+				if (BUTTON_LEVEL?(BUTTON_PORT&BUTTON_MSK):!(BUTTON_PORT&BUTTON_MSK)){	\
 					if (__nc__!=0){				\
 						__nc__--;			\
 						if (__nc__==0){
@@ -220,10 +220,6 @@
 				}						\
 			}
 #define CLOSE_IF_BUTTON()	}
-
-#endif
-
-
 
 #define init(){												\
 													\
@@ -250,9 +246,10 @@
 	TCCR1A	= TCCR1A_REG;	\
 	TCCR1B	= TCCR1B_REG;	\
 				\
-	OCR0A	 = OCR0A_REG;	\
-	TCCR0A	 = TCCR0A_REG;	\
-	TCCR0B	 = TCCR0B_REG;	\
+	OCR0A	= OCR0A_REG;	\
+	TCCR0A	= TCCR0A_REG;	\
+	TCCR0B	= TCCR0B_REG;	\
+	OSCCAL	= eeprom_read_byte(&OSCCAL_REG);
 }
 
 
@@ -268,3 +265,5 @@
 	}							\
 }
 
+
+#endif
