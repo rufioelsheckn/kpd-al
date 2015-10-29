@@ -23,12 +23,12 @@ OBJ_DIR := obj
 CC_OPTS :=  -MD $(INC_DIRS_OPT) $(DEFINE_OPT) -O2 -mmcu=$(MMCU) -Wall
 LINK_OPTS := -mmcu=$(MMCU) -Os -Wl,-Map=$(OBJ_DIR)/mapfile.map
 
-OBJFILES := main.o service.o regeneration.o kpd-al-lib.o
+OBJFILES := kpd-al-lib.o main.o service.o regeneration.o
 OBJFILES := $(addprefix $(OBJ_DIR)/, $(OBJFILES))
 
 TEST_FILES := $(addprefix $(BIN_DIR)/test_, $(addsuffix .hex, $(basename $(notdir $(wildcard $(TESTS_DIR)/*.c)))))
 
-target:$(BIN_DIR)/$(PROGNAME).hex
+target:$(BIN_DIR)/$(PROGNAME).hex $(BIN_DIR)/$(PROGNAME).eep
 	@echo
 	@echo "Success!"
 	@$(SIZE) $<
@@ -40,8 +40,18 @@ $(BIN_DIR)/%.hex: $(OBJ_DIR)/%.elf
 	@mkdir -p $(BIN_DIR)
 	$(OBJCOPY) -O ihex -j .text -j .data $< $@
 
+$(BIN_DIR)/%.eep: $(OBJ_DIR)/%.elf
+	@mkdir -p $(BIN_DIR)
+	#$(OBJCOPY) -O ihex -j .eeprom $< $@
+	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
+	--change-section-lma .eeprom=0 --no-change-warnings -O ihex $< $@ || exit 0
+
+
 prog:$(BIN_DIR)/$(PROGNAME).hex
-	sh avrprog.sh $(PROG_MK) $<
+	avrdude -p $(PROG_MK) -c stk500 -U flash:w:$<:i
+
+prog_ee:$(BIN_DIR)/$(PROGNAME).eep
+	avrdude -p $(PROG_MK) -c stk500 -U eeprom:w:$<:i
 
 tst:$(TEST_FILES)
 

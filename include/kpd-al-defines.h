@@ -167,7 +167,7 @@
 //-------------------------------------- прочее --------------------------------------
 #define	MAX_N			20
 #define	PROG_WAIT		255
-#define PRINT_DELAY		100
+#define PRINT_DELAY		200
 #define	PRINT_DEL		9
 
 
@@ -187,13 +187,12 @@
 
 #define	ee_read_mark() {dh = eeprom_read_byte(mark);dm = eeprom_read_byte(mark+1);dl = eeprom_read_byte(mark+2);}
 #define	pm_init_const() {tau = pgm_read_word(&PUMP_tau);T = pgm_read_word(&PUMP_T);}
-#define mul3(x) {x+=x<<1;}
 
 #define MAIN_TIME_ms(x)	(x*F_CPU/(1000ULL*T0PRESC*(1+OCR0A_REG)))
 #define MAIN_TIME_s(x)	(x*F_CPU/(T0PRESC*(1+OCR0A_REG)))
 #define MAIN_TIME_m(x)	(x*60*F_CPU/(T0PRESC*(1+OCR0A_REG)))
 
-#define DIGS(x)	pgm_read_byte(digs+(x));
+#define DIGS(x)	pgm_read_byte(digs+(x))
 
 //относительно автономный блок восприятия нажатия кнопки с антидребезгом. выделен отдельно для облегчения наладки
 //код, который надо выполнить при условии, что кнопка была нажата, надо вставить между макросами IF_BUTTON и END_IF_BUTTON
@@ -249,7 +248,7 @@
 	OCR0A	= OCR0A_REG;	\
 	TCCR0A	= TCCR0A_REG;	\
 	TCCR0B	= TCCR0B_REG;	\
-	OSCCAL	= eeprom_read_byte(&OSCCAL_REG);
+	OSCCAL	= eeprom_read_byte(&OSCCAL_REG);\
 }
 
 

@@ -27,5 +27,15 @@ inline void service(){
 }
 
 void inline refresh(){
-	div_1000_dp(Kli/((uint16_t)((D-A)>>2)));
+	uint32_t tmp = (Kli/((D-A)>>2));
+	dh = DIGS(tmp/1000);
+	tmp %= 1000;
+	dm = DIGS(tmp/100)|S(DP);
+	tmp %= 100;
+	dl = DIGS(tmp/10);
+	if (dh == D0){
+		dh = dm;
+		dm = dl;
+		dl = DIGS(tmp%10);
+	}
 }

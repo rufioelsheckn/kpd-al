@@ -9,14 +9,6 @@ const	uint8_t		PROGMEM	D_MARK[]	= {D1,D0,D1,D2,D1,D3,D1,D4,D1,D6};
 
 
 
-uint8_t 	EEMEM	mark[3]			= {D1,D2,D3};
-uint16_t	EEMEM	N[MAX_N]		= {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-uint8_t		EEMEM	ee_N			= 0;
-uint8_t		EEMEM	ee_Tbw			= 0;
-uint8_t		EEMEM	ee_flt			= 0;
-
-uint8_t		EEMEM	ee_sensor1=0, ee_sensor2=1;
-
 void prog_qmax(int8_t add);
 void makeQmax();
 void read_ftl(uint8_t x);
@@ -27,8 +19,8 @@ int main(){
 	init();
 	_delay_ms(500);
 	
-	if ((!(BUTTON_PORT&BUTTON_MSK))^BUTTON_LEVEL){
-		status	|= STATUS_NEED_PROGRAM;
+	if (BUTTON_LEVEL?(BUTTON_PORT&BUTTON_MSK):!(BUTTON_PORT&BUTTON_MSK)){
+		status	= STATUS_NEED_PROGRAM;
 	}
 
 	pm_init_const();
@@ -37,18 +29,15 @@ int main(){
 	
 	print();
 
-	if ((status&&STATUS_NEED_PROGRAM)&&((!(BUTTON_PORT&BUTTON_MSK))^BUTTON_LEVEL)){
-		status	|= STATUS_NEED_PROGRAM;
-	}
-	else{
+	if (BUTTON_LEVEL?!(BUTTON_PORT&BUTTON_MSK):(BUTTON_PORT&BUTTON_MSK)){
 		status = 0;
 	}
 	
 	{
 		uint8_t u;
 		u = eeprom_read_byte(SENSOR_CHANGE_PORT&SENSOR_CHANGE_MSK?&ee_sensor2:&ee_sensor1);
-		Kli = pgm_read_word(sensors+u);
-		mul3(u);
+		Kli = pgm_read_dword(sensors+u);
+		u*=3;
 
 		asm volatile (
 			"add %A3,%4\n\t"
@@ -57,7 +46,7 @@ int main(){
 			"lpm %1,Z+\n\t"
 			"lpm %2,Z\n\t"
 			:"=a"(dh),"=a"(dm),"=a"(dl)
-			:"z"(sensors_disp),"r"(u)
+			:"z"(sensors_disp),"a"(u)
 		);
 	}
 
@@ -72,6 +61,7 @@ int main(){
 		programming();
 	}
 	t3 = ((uint32_t)n)*Kli/1248/pgm_read_byte(D_K+eeprom_read_byte(&ee_flt));
+	n_before = n;
 	service();
 	return 0;
 }
@@ -180,7 +170,17 @@ void prog_qmax(int8_t add){
 
 
 void makeQmax(){
-	div_10000(((uint32_t)n)*Kli/T/1248);
+	uint32_t tmp = (n*Kli/T/1248);
+	dh = DIGS(tmp/1000);
+	tmp %= 1000;
+	dm = DIGS(tmp/100)|S(DP);
+	tmp %= 100;
+	dl = DIGS(tmp/10);
+	if (dh == D0){
+		dh = dm;
+		dm = dl;
+		dl = DIGS(tmp%10);
+	}
 }
 
 void makeTbw(){

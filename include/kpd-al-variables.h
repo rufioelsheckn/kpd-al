@@ -19,7 +19,7 @@ extern				uint16_t	T;		/*Суммарный период работы насос
 extern				uint32_t	Tbw;		/*Время обратной промывки фильтра*/
 extern				uint16_t	t3;		/*Период ипульсов насоса в режиме прямой промывки*/
 
-extern				uint16_t	Kli;		/*Kил используемого датчика*/
+extern				uint32_t	Kli;		/*Kил используемого датчика*/
 
 extern				uint32_t	A,B,C,D;	/*Предыдущие показания воды*/
 extern				uint16_t	n;		/*количество импульсов необходимое для включения насоса*/
@@ -27,11 +27,20 @@ extern				uint16_t	n_before;	/*Количество импульсов до сл
 
 extern				uint8_t		dh,dm,dl;	/*Значения разрядов*/
 extern		const		uint8_t		PROGMEM digs[] asm("DIGS");
-extern		const		uint16_t	PROGMEM	sensors[];
+extern		const		uint32_t	PROGMEM	sensors[];
 extern		const		uint8_t		PROGMEM	sensors_disp[];
 
 
 extern				uint8_t		ee_sensor1, ee_sensor2;
 extern				uint8_t		EEMEM	OSCCAL_REG;
+
+extern				uint8_t		EEMEM	OSCCAL_REG;
+extern				uint8_t 	EEMEM	mark[3];
+extern				uint16_t	EEMEM	N[MAX_N];
+extern				uint8_t		EEMEM	ee_N;
+extern				uint8_t		EEMEM	ee_Tbw;
+extern				uint8_t		EEMEM	ee_flt;
+
+extern				uint8_t		EEMEM	ee_sensor1, ee_sensor2;
 
 #endif
